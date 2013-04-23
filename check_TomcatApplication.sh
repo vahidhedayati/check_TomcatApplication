@@ -101,12 +101,12 @@ done
 if wget -o /dev/null -O - http://$USER:$PASSWORD@$HOST:$PORT/manager/list | grep -q "^/$APP:running"  
 then
         return_status="OK: Application $APP is running!"
-
- 	wget -o /dev/null -O - http://$USER:$PASSWORD@$HOST:$PORT/manager/status?XML=true |sed -e "s/\/>/\/>\n/g"|egrep "(connector|requestInfo)"|sed -e "s/\"//g"|awk -v app=$APP '{
-	if ($0 ~ "connector name=")  { value=$2; all=substr(value,7,15);  ncount=index(all,"<")-3; connector=substr(all,0,ncount);}
-	if ($0 ~ "<requestInfo") {  print app"_"connector" OK:|"connector"_"$2"ms;;;0 "connector"_"$3"ms;;;0 "connector"_"$4"ms;;;0 "connector"_"$5"ms;;;0 "connector"_"$6"ms;;;0 "connector"_"$7"ms;;;0"; } ;}'
-
+        wget -o /dev/null -O - http://$USER:$PASSWORD@$HOST:$PORT/manager/status?XML=true |sed -e "s/\/>/\/>\n/g"|egrep "(connector|requestInfo|<memory)"|sed -e "s/\"//g"|sed -e "s/'//g"|awk -v app=$APP '{
+        if ($0 ~ "connector name=")  { value=$2; all=substr(value,7,15);  ncount=index(all,"<")-3; connector=substr(all,0,ncount);}
+        if ($0 ~ "<memory ") {  jm=$9; ccount=index(jm,"/")-1; jmax=substr($9,0,ccount); print app"_JVM_OK:|" JVM_$7"MB;;;0 JVM_"$8"MB;;;0 JVM_"jmax"MB;;;0"};
+        if ($0 ~ "<requestInfo") {  print app"_"connector" OK:|"connector"_"$2"ms;;;0 "connector"_"$3"ms;;;0 "connector"_"$4"ms;;;0 "connector"_"$5"ms;;;0 "connector"_"$6"ms;;;0 "connector"_"$7"ms;;;0"; } ;}'
         exit $NAGIOS_OK
+
 
 else
          echo "CRITICAL: Application $APP is not running!"
