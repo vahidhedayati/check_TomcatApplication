@@ -21,7 +21,7 @@ print_help() {
     echo ""
     echo "$PROGNAME is a Nagios plugin to check a specific Tomcat Application."
     echo ""
-    echo "$PROGNAME -u user -p password -h host -P port -a application"
+    echo "$PROGNAME -u user -p password -H host -P port -a application"
     echo ""
     echo "Options:"
     echo "  -u/--user)"
@@ -103,7 +103,7 @@ then
         return_status="OK: Application $APP is running!"
  	wget -o /dev/null -O - http://$USER:$PASSWORD@$HOST:$PORT/manager/status?XML=true |sed -e "s/\/>/\/>\n/g"|egrep "(connector|requestInfo|<memory)"|sed -e "s/\"//g"|sed -e "s/'//g"|awk -v app=$APP '{
 	if ($0 ~ "connector name=")  {  value=$2; all=substr(value,6,13);  ncount=index(all,"<")-2; connector=substr(all,0,ncount);}
-	if ($0 ~ "<memory ") {  jm=$9; ccount=index(jm,"/")-1; jmax=substr($9,0,ccount); print app"_JVM_OK:|" app"_JVM_"$7"MB;;;0 "app"_JVM_"$8"MB;;;0 "app"_JVM_"jmax"MB;;;0"};
+	if ($0 ~ "<memory ") {  jm=$9; ccount=index(jm,"/")-1; jmax=substr($9,0,ccount); print app"_JVM_OK:|" app"_JVM_"$7"Bytes;;;0 "app"_JVM_"$8"Bytes;;;0 "app"_JVM_"jmax"Bytes;;;0"};
 	if ($0 ~ "<requestInfo") {  print app"_"connector" OK:|"connector"_"$2"ms;;;0 "connector"_"$3"ms;;;0 "connector"_"$4"ms;;;0 "connector"_"$5"ms;;;0 "connector"_"$6"ms;;;0 "connector"_"$7"ms;;;0"; } ;}'
         exit $NAGIOS_OK
 
